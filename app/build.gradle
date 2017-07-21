@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+android {
+    compileSdkVersion rootProject.ext.androidCompileSdkVersion
+    buildToolsVersion rootProject.ext.androidBuildToolsVersion
+
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+
+    defaultConfig {
+        applicationId "cn.linghaiweiye.farmsmonitor"
+        minSdkVersion rootProject.ext.androidMinSdkVersion
+        targetSdkVersion rootProject.ext.androidTargetSdkVersion
+        versionCode rootProject.ext.androidVersionCode
+        versionName rootProject.ext.androidVersionName
+    }
+
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword '384795'
+            storeFile file('../buildsystem/lulu.jks')
+            storePassword '384795'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+            shrinkResources false
+            minifyEnabled false
+        }
+        release {
+            signingConfig signingConfigs.config
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+        xmlReport false
+        check 'NewApi', 'InlinedApi'
+    }
+}
+
+dependencies {
+    def appDependencies = rootProject.ext.appDependencies
+    apt appDependencies.daggerCompiler
+    annotationProcessor appDependencies.butterKnifeApt
+
+    compile appDependencies.dagger
+    compile appDependencies.glide
+    compile appDependencies.recyclerView
+    compile appDependencies.android_design
+    compile appDependencies.butterKnife
+
+    compile project(':data')
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+}
